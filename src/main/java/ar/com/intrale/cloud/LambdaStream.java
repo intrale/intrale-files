@@ -6,9 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +15,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 
 import ar.com.intrale.cloud.config.ApplicationConfig;
-import io.micronaut.context.ApplicationContextBuilder;
-import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.function.aws.MicronautRequestStreamHandler;
 
