@@ -38,7 +38,10 @@ public class LambdaStream extends MicronautRequestStreamHandler {
         String input = IOUtils.toString(inputStream, encoding);
         LOGGER.info("LambdaStream: " + input);
         
-        S3Object s3Object = provider.getObject(config.getS3().getBucketName(), "12afd795-09e1-47f8-8ed1-1ae1b0216d83");
+        LOGGER.info("config: " + config);
+        LOGGER.info("provider: " + provider);
+        String bucketName = config.getS3().getBucketName();
+        S3Object s3Object = provider.getObject(bucketName, "12afd795-09e1-47f8-8ed1-1ae1b0216d83");
         
         IOUtils.copy(s3Object.getObjectContent(), outputStream);
         
