@@ -32,7 +32,6 @@ public class LambdaStream extends MicronautRequestStreamHandler {
 	
 	private AmazonS3 provider;
 	
-	@PostConstruct
 	public void initialize() {
 		LOGGER.info("LambdaStream initialize: START");  
 		config = applicationContext.getBean(ApplicationConfig.class);
@@ -42,6 +41,7 @@ public class LambdaStream extends MicronautRequestStreamHandler {
 	
 	@Override
 	public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
+		initialize();
 		LOGGER.info("LambdaStream: START");        
 		Charset encoding = Charset.forName("UTF-8");
         String input = IOUtils.toString(inputStream, encoding);
