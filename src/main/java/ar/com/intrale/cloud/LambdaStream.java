@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,22 +23,24 @@ import io.micronaut.function.aws.MicronautRequestStreamHandler;
 @Introspected
 public class LambdaStream extends MicronautRequestStreamHandler {
 
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseFunction.class);
 	
+	@Inject
 	protected ApplicationConfig config;
 	
+	@Inject
 	private AmazonS3 provider;
-	
-	public void initialize() {
-		LOGGER.info("LambdaStream initialize: START");  
-		config = applicationContext.getBean(ApplicationConfig.class);
-		provider = applicationContext.getBean(AmazonS3.class);
-		LOGGER.info("LambdaStream initialize: END");
+
+
+	public LambdaStream() {
+		super();
+		LOGGER.info("LambdaStream: constructor");   
+		applicationContext.inject(this);
 	}
 	
 	@Override
 	public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
-		initialize();
 		LOGGER.info("LambdaStream: START");        
 		Charset encoding = Charset.forName("UTF-8");
         String input = IOUtils.toString(inputStream, encoding);
