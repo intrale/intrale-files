@@ -23,7 +23,6 @@ import io.micronaut.function.aws.MicronautRequestStreamHandler;
 @Introspected
 public class LambdaStream extends MicronautRequestStreamHandler {
 
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseFunction.class);
 	
 	@Inject
@@ -32,15 +31,9 @@ public class LambdaStream extends MicronautRequestStreamHandler {
 	@Inject
 	private AmazonS3 provider;
 
-
-	public LambdaStream() {
-		super();
-		LOGGER.info("LambdaStream: constructor");   
-		applicationContext.inject(this);
-	}
 	
 	@Override
-	public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
+	public void execute(InputStream inputStream, OutputStream outputStream) throws IOException {
 		LOGGER.info("LambdaStream: START");        
 		Charset encoding = Charset.forName("UTF-8");
         String input = IOUtils.toString(inputStream, encoding);
