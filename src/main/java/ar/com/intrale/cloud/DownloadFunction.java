@@ -13,7 +13,7 @@ import ar.com.intrale.cloud.exceptions.FunctionException;
 
 @Singleton
 @Named(DownloadFunction.FUNCTION_NAME)
-public class DownloadFunction extends BaseFunction<DownloadRequest, S3ObjectInputStream, AmazonS3, StringToGetProductImageRequestBuilder, ObjectToSameBuilder> {
+public class DownloadFunction extends BaseFunction<DownloadRequest, S3ObjectInputStream, AmazonS3, StringToGetProductImageRequestBuilder, FunctionResponseToHttpResponseBuilder> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFunction.class);
 	
