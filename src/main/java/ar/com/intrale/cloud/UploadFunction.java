@@ -69,7 +69,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, String, AmazonS3
             String[] boundaryArray = contentType.split("=");
             
             //Transform the boundary to a byte array
-            byte[] boundary = boundaryArray[1].getBytes();
+            byte[] boundary = boundaryArray[0].getBytes();
         	
             //Log the extraction for verification purposes
             LOGGER.info(new String(bI, "UTF-8") + "\n"); 
