@@ -63,6 +63,8 @@ public class UploadFunction extends BaseFunction<UploadRequest, String, AmazonS3
             if (hps != null) {
                 contentType = hps.get("content-type");
             }
+            LOGGER.info("contentType:" + contentType);
+            
             String[] boundaryArray = contentType.split("=");
             
             //Transform the boundary to a byte array
