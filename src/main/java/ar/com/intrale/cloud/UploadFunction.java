@@ -55,76 +55,67 @@ public class UploadFunction extends BaseFunction<UploadRequest, String, AmazonS3
 
         try {
         	
-            //Get the uploaded file and decode from base64
-            byte[] bI = Base64.decodeBase64(request.getContent().getBytes());
+            //Obtenga el archivo cargado y decodifique desde base64
+            byte[] decodeContent = Base64.decodeBase64(request.getContent().getBytes());
             
-            //Get the content-type header and extract the boundary
-            /*Map<String, String> hps = null ;//= headers;
-            if (hps != null) {
-                contentType = hps.get("content-type");
-            }*/
+            //Obtenga el encabezado de tipo de contenido y extraiga el límite
             contentType = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE);
             LOGGER.info("contentType:" + contentType);
             
-            String[] boundaryArray = contentType.split("=");
+            //String[] boundaryArray = contentType.split("=");
             
-            //Transform the boundary to a byte array
-            byte[] boundary = boundaryArray[0].getBytes();
+            //Transforma el límite en una matriz de bytes
+            //byte[] boundary = boundaryArray[0].getBytes();
         	
-            //Log the extraction for verification purposes
-            LOGGER.info(new String(bI, "UTF-8") + "\n"); 
+            //Registre la extracción con fines de verificación
+            LOGGER.info("decodeContent:" + new String(decodeContent, "UTF-8") + "\n"); 
             
-            //Create a ByteArrayInputStream
-            ByteArrayInputStream content = new ByteArrayInputStream(bI);
-            
-            //Create a MultipartStream to process the form-data
+            //Crear un ByteArrayInputStream
+            ByteArrayInputStream content = new ByteArrayInputStream(decodeContent);
+        	
+            //Crear un ByteArrayOutputStream
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            //Cree un MultipartStream para procesar los datos del formulario
             MultipartStream multipartStream =
-              new MultipartStream(content, boundary, bI.length, null);
-        	
-            //Create a ByteArrayOutputStream
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-        	
-            //Find first boundary in the MultipartStream
+              new MultipartStream(content, contentType.getBytes(), decodeContent.length, null);
+            
+            //Encuentra el primer límite en MultipartStream
             boolean nextPart = multipartStream.skipPreamble();
             
-            //Loop through each segment
+            //Recorre cada segmento
             while (nextPart) {
                 String header = multipartStream.readHeaders();
                 
-                //Log header for debugging
+                //Encabezado de registro para depuración
                 LOGGER.info("Headers:");
                 LOGGER.info(header);
                 
-                //Write out the file to our ByteArrayOutputStream
-                multipartStream.readBodyData(out);
-                //Get the next part, if any
+                //Escriba el archivo en nuestra ByteArrayOutputStream
+                multipartStream.readBodyData(outputStream);
+                //Obtenga la siguiente parte, si corresponde
                 nextPart = multipartStream.readBoundary();
             }
             
-            //Log completion of MultipartStream processing
+            //Finalización del registro del procesamiento MultipartStream
             LOGGER.info("Data written to ByteStream");
             
-            //Prepare an InputStream from the ByteArrayOutputStream
-            InputStream fis = new ByteArrayInputStream(out.toByteArray());
-        	
-            //Create our S3Client Object
-            /*AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                    .withRegion(clientRegion)
-                    .build();*/
-    
-            //Configure the file metadata
+            //Prepare un InputStream desde ByteArrayOutputStream
+            InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+     
+            //Configurar los metadatos del archivo
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(out.toByteArray().length);
+            metadata.setContentLength(outputStream.toByteArray().length);
             metadata.setContentType("image/jpeg");
             metadata.setCacheControl("public, max-age=31536000");
             
-            //Put file into S3
-            provider.putObject(config.getS3().getBucketName(), fileObjKeyName, fis, metadata);
+            //Ponga el archivo en S3
+            provider.putObject(config.getS3().getBucketName(), fileObjKeyName, inputStream, metadata);
            
-            //Log status
+            //Estado de registro
             LOGGER.info("Put object in S3");
 
-            //Provide a response
+            //Contruir el response
             response.setStatusCode(200);
             Map<String, String> responseBody = new HashMap<String, String>();
             responseBody.put("Status", "File stored in S3");
