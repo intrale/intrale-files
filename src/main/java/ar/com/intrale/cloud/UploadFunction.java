@@ -34,7 +34,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, String, AmazonS3
 	
 	@Override
 	public String execute(UploadRequest request) throws FunctionException {
-		LOGGER.info("Loading Java Lambda handler of Proxy");
+		LOGGER.info("Ejecutando funcion para el upload de archivos");
         
         //Log the length of the incoming body
 		LOGGER.info(String.valueOf(request.getContent().getBytes().length));
