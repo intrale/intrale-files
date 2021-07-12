@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.MultipartStream;
 import org.slf4j.Logger;
@@ -21,9 +24,13 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import ar.com.intrale.cloud.exceptions.FunctionException;
 import net.minidev.json.JSONObject;
 
+@Singleton
+@Named(UploadFunction.FUNCTION_NAME)
 public class UploadFunction extends BaseFunction<UploadRequest, String, AmazonS3, StringToUploadRequestBuilder, FunctionResponseToHttpResponseBuilder> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UploadFunction.class);
+	
+	public static final String FUNCTION_NAME = "upload";
 	
 	@Override
 	public String execute(UploadRequest request) throws FunctionException {
