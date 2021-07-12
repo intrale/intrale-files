@@ -2,7 +2,7 @@ package ar.com.intrale.cloud;
 
 import ar.com.intrale.cloud.Request;
 
-public class GetProductImageRequest extends Request {
+public class DownloadRequest extends Request {
 
 	private String id;
 	private String ext;

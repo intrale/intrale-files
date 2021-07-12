@@ -12,15 +12,15 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import ar.com.intrale.cloud.exceptions.FunctionException;
 
 @Singleton
-@Named(GetProductImageFunction.FUNCTION_NAME)
-public class GetProductImageFunction extends BaseFunction<GetProductImageRequest, S3ObjectInputStream, AmazonS3, StringToGetProductImageRequestBuilder, ObjectToSameBuilder> {
+@Named(DownloadFunction.FUNCTION_NAME)
+public class DownloadFunction extends BaseFunction<DownloadRequest, S3ObjectInputStream, AmazonS3, StringToGetProductImageRequestBuilder, ObjectToSameBuilder> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(GetProductImageFunction.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFunction.class);
 	
-	public static final String FUNCTION_NAME = "getImage";
+	public static final String FUNCTION_NAME = "download";
 
 	@Override
-	public S3ObjectInputStream execute(GetProductImageRequest request) throws FunctionException {
+	public S3ObjectInputStream execute(DownloadRequest request) throws FunctionException {
 		LOGGER.info("GetProductImageFunction execute");
 		return provider.getObject(config.getS3().getBucketName(), request.getId()).getObjectContent();
 	}
