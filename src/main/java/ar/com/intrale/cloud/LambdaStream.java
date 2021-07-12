@@ -1,22 +1,10 @@
 package ar.com.intrale.cloud;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-
-import javax.inject.Inject;
-
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.S3Object;
-
-import ar.com.intrale.cloud.config.ApplicationConfig;
+import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.function.aws.MicronautRequestStreamHandler;
 
@@ -25,14 +13,15 @@ public class LambdaStream extends MicronautRequestStreamHandler {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseFunction.class);
 	
-	@Inject
-	protected ApplicationConfig config;
-	
-	@Inject
-	private AmazonS3 provider;
+	@Override
+	protected String resolveFunctionName(Environment env) {
+		return "files";
+	}
+
+
 
 	
-	@Override
+/*	@Override
 	public void execute(InputStream inputStream, OutputStream outputStream) throws IOException {
 		LOGGER.info("LambdaStream: START");        
 		Charset encoding = Charset.forName("UTF-8");
@@ -50,7 +39,7 @@ public class LambdaStream extends MicronautRequestStreamHandler {
         //String output = "My first request handler: " + input;
         //IOUtils.write(output, outputStream, encoding);
         LOGGER.info("LambdaStream: END");
-	}
+	}*/
 
 
 }
