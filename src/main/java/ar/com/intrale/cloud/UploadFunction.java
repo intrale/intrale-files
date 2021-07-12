@@ -12,6 +12,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.MultipartStream;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +57,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         	
             //Obtenga el archivo cargado y decodifique desde base64
             byte[] decodeContent = Base64.decodeBase64(request.getContent().getBytes());
+            LOGGER.info("decodeContent.length:" + decodeContent.length);
             
             //Obtenga el encabezado de tipo de contenido y extraiga el límite
             contentType = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE);
@@ -67,7 +69,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             //byte[] boundary = boundaryArray[0].getBytes();
         	
             //Registre la extracción con fines de verificación
-            LOGGER.info("decodeContent:" + new String(decodeContent, "UTF-8") + "\n"); 
+            //LOGGER.info("decodeContent:" + new String(decodeContent, "UTF-8") + "\n"); 
             
             //Crear un ByteArrayInputStream
             ByteArrayInputStream content = new ByteArrayInputStream(decodeContent);
@@ -76,7 +78,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             //Cree un MultipartStream para procesar los datos del formulario
-            MultipartStream multipartStream =
+            /*MultipartStream multipartStream =
               new MultipartStream(content, contentType.getBytes(), decodeContent.length, null);
             
             //Encuentra el primer límite en MultipartStream
@@ -106,13 +108,14 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(outputStream.toByteArray().length);
             metadata.setContentType("image/jpeg");
-            metadata.setCacheControl("public, max-age=31536000");
-            
+            metadata.setCacheControl("public, max-age=31536000");*/
+
+            IOUtils.write(decodeContent, outputStream);
             LOGGER.info("ContentLength:" + outputStream.toByteArray().length);
             
             //Ponga el archivo en S3
             //provider.putObject(config.getS3().getBucketName(), fileObjKeyName, inputStream, metadata);
-            provider.putObject(config.getS3().getBucketName(), fileObjKeyName, Files.write(Paths.get("/tmp/" + "sameName.jpg"), outputStream.toByteArray()).toFile());
+            provider.putObject(config.getS3().getBucketName(), fileObjKeyName,  Files.write(Paths.get("/tmp/" + "sameName.jpg"), outputStream.toByteArray()).toFile());
 
             
             //Estado de registro 
