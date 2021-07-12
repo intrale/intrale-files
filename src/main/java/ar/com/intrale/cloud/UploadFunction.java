@@ -59,10 +59,11 @@ public class UploadFunction extends BaseFunction<UploadRequest, String, AmazonS3
             byte[] bI = Base64.decodeBase64(request.getContent().getBytes());
             
             //Get the content-type header and extract the boundary
-            Map<String, String> hps = null ;//= headers;
+            /*Map<String, String> hps = null ;//= headers;
             if (hps != null) {
                 contentType = hps.get("content-type");
-            }
+            }*/
+            contentType = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE);
             LOGGER.info("contentType:" + contentType);
             
             String[] boundaryArray = contentType.split("=");
