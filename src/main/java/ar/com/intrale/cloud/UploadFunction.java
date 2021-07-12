@@ -26,14 +26,14 @@ import net.minidev.json.JSONObject;
 
 @Singleton
 @Named(UploadFunction.FUNCTION_NAME)
-public class UploadFunction extends BaseFunction<UploadRequest, String, AmazonS3, StringToUploadRequestBuilder, FunctionResponseToHttpResponseBuilder> {
+public class UploadFunction extends BaseFunction<UploadRequest, Response, AmazonS3, StringToUploadRequestBuilder, FunctionResponseToHttpResponseBuilder> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UploadFunction.class);
 	
 	public static final String FUNCTION_NAME = "upload";
 	
 	@Override
-	public String execute(UploadRequest request) throws FunctionException {
+	public Response execute(UploadRequest request) throws FunctionException {
 		LOGGER.info("Ejecutando funcion para el upload de archivos");
         
         //Log the length of the incoming body
@@ -110,19 +110,22 @@ public class UploadFunction extends BaseFunction<UploadRequest, String, AmazonS3
             metadata.setCacheControl("public, max-age=31536000");
             
             //Ponga el archivo en S3
-            provider.putObject(config.getS3().getBucketName(), fileObjKeyName, inputStream, metadata);
-           
+            //provider.putObject(config.getS3().getBucketName(), fileObjKeyName, inputStream, metadata);
+            provider.putObject(config.getS3().getBucketName(), fileObjKeyName, content, metadata);
+
+            
             //Estado de registro
             LOGGER.info("Put object in S3");
 
             //Contruir el response
-            response.setStatusCode(200);
+            /*response.setStatusCode(200);
             Map<String, String> responseBody = new HashMap<String, String>();
             responseBody.put("Status", "File stored in S3");
             String responseBodyString = new JSONObject(responseBody).toJSONString();
             response.setBody(responseBodyString);
             
-            return responseBodyString;
+            return responseBodyString;*/
+            return new Response();
 
         } 
         catch(AmazonServiceException e) {
