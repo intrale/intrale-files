@@ -4,8 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -22,7 +22,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import ar.com.intrale.cloud.exceptions.FunctionException;
-import net.minidev.json.JSONObject;
 
 @Singleton
 @Named(UploadFunction.FUNCTION_NAME)
@@ -109,12 +108,14 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             metadata.setContentType("image/jpeg");
             metadata.setCacheControl("public, max-age=31536000");
             
+            LOGGER.info("ContentLength:" + outputStream.toByteArray().length);
+            
             //Ponga el archivo en S3
             //provider.putObject(config.getS3().getBucketName(), fileObjKeyName, inputStream, metadata);
-            provider.putObject(config.getS3().getBucketName(), fileObjKeyName, content, metadata);
+            provider.putObject(config.getS3().getBucketName(), fileObjKeyName, Files.write(Paths.get("/tmp/" + "sameName.jpg"), outputStream.toByteArray()).toFile());
 
             
-            //Estado de registro
+            //Estado de registro 
             LOGGER.info("Put object in S3");
 
             //Contruir el response
