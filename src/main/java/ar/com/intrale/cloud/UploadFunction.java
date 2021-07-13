@@ -20,11 +20,9 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import ar.com.intrale.cloud.exceptions.FunctionException;
-import io.micronaut.http.MediaType;
 import net.minidev.json.JSONObject;
 
 @Singleton
@@ -59,6 +57,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             byte[] base64Content = Base64.decodeBase64(request.getContent().getBytes());
             LOGGER.info("Get the uploaded file and decode from base64 length:" + String.valueOf(base64Content.length));
             
+            
             byte[] boundary = getBoundary(request, contentType, base64Content); 
             
             //Create a ByteArrayInputStream
@@ -68,12 +67,11 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             
             //Create a MultipartStream to process the form-data
             MultipartStream multipartStream =
-              new MultipartStream(content, boundary, base64Content.length, null);
+              new MultipartStream(content, boundary, boundary.length, null);
             //MultipartStream multipartStream =
               //      new MultipartStream(content, MediaType.MULTIPART_FORM_DATA.getBytes(), base64Content.length, null);
             
-            LOGGER.info("multipartStream.toString():" + multipartStream.toString());
-        	
+
             //Create a ByteArrayOutputStream
             ByteArrayOutputStream out = new ByteArrayOutputStream();
         	
