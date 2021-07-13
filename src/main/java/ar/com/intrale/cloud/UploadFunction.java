@@ -59,7 +59,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             byte[] base64Content = Base64.decodeBase64(request.getContent().getBytes());
             LOGGER.info("Get the uploaded file and decode from base64 length:" + String.valueOf(base64Content.length));
             
-            byte[] boundary = toDelete(request, contentType, base64Content); 
+            byte[] boundary = getBoundary(request, contentType, base64Content); 
             
             //Create a ByteArrayInputStream
             ByteArrayInputStream content = new ByteArrayInputStream(base64Content);
@@ -146,7 +146,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         return new Response();
     }
 
-	protected byte[] toDelete(UploadRequest request, String contentType, byte[] base64Content)
+	protected byte[] getBoundary(UploadRequest request, String contentType, byte[] base64Content)
 			throws UnsupportedEncodingException {
 		//Get the content-type header and extract the boundary
 		LOGGER.info("HEADERS:" + request.getHeaders());
@@ -162,7 +162,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
 		byte[] boundary = boundaryArray[1].getBytes();
 		
 		//byte[] boundary = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE).getBytes();
-		LOGGER.info("boundaryArray:" + new String(boundary));
+		LOGGER.info("boundary:" + new String(boundary));
 		
 		return boundary;
 	}
