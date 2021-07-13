@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import ar.com.intrale.cloud.exceptions.FunctionException;
+import io.micronaut.http.MediaType;
 import net.minidev.json.JSONObject;
 
 @Singleton
@@ -57,23 +59,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             byte[] base64Content = Base64.decodeBase64(request.getContent().getBytes());
             LOGGER.info("Get the uploaded file and decode from base64 length:" + String.valueOf(base64Content.length));
             
-            //Get the content-type header and extract the boundary
-            LOGGER.info("HEADERS:" + request.getHeaders());
-            
-            Map<String, String> hps = request.getHeaders();
-            if (hps != null) {
-                contentType = hps.get("Content-Type");
-                LOGGER.info("Content-Type:" + contentType);
-            }
-            String[] boundaryArray = contentType.split("=");
-            
-            //Transform the boundary to a byte array
-            byte[] boundary = boundaryArray[1].getBytes();
-            
-            //byte[] boundary = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE).getBytes();
-        	
-            //Log the extraction for verification purposes
-            LOGGER.info("Log the extraction for verification purposes:" + new String(base64Content, "UTF-8") + "\n"); 
+            //byte[] boundary = toDelete(request, contentType, base64Content); 
             
             //Create a ByteArrayInputStream
             ByteArrayInputStream content = new ByteArrayInputStream(base64Content);
@@ -81,8 +67,10 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             LOGGER.info("Create a ByteArrayInputStream:" + content.readAllBytes().length);
             
             //Create a MultipartStream to process the form-data
+            //MultipartStream multipartStream =
+              //new MultipartStream(content, boundary, base64Content.length, null);
             MultipartStream multipartStream =
-              new MultipartStream(content, boundary)/*, base64Content.length, null)*/;
+                    new MultipartStream(content, MediaType.MULTIPART_FORM_DATA.getBytes(), base64Content.length, null);
             
             LOGGER.info("multipartStream.toString():" + multipartStream.toString());
         	
@@ -157,6 +145,28 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         LOGGER.info(response.toString());
         return new Response();
     }
+
+	protected byte[] toDelete(UploadRequest request, String contentType, byte[] base64Content)
+			throws UnsupportedEncodingException {
+		//Get the content-type header and extract the boundary
+		LOGGER.info("HEADERS:" + request.getHeaders());
+		
+		Map<String, String> hps = request.getHeaders();
+		if (hps != null) {
+		    contentType = hps.get("Content-Type");
+		    LOGGER.info("Content-Type:" + contentType);
+		}
+		String[] boundaryArray = contentType.split("=");
+		
+		//Transform the boundary to a byte array
+		byte[] boundary = boundaryArray[1].getBytes();
+		
+		//byte[] boundary = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE).getBytes();
+		
+		//Log the extraction for verification purposes
+		LOGGER.info("Log the extraction for verification purposes:" + new String(base64Content, "UTF-8") + "\n");
+		return boundary;
+	}
 	
 
 }
