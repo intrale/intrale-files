@@ -66,10 +66,12 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             LOGGER.info("Create a ByteArrayInputStream:" + content.readAllBytes().length);
             
             //Create a MultipartStream to process the form-data
+            /*MultipartStream multipartStream =
+              new MultipartStream(content, boundary, boundary.length, null);*/
+            int bufSize = base64Content.length / 5;
+            LOGGER.info("bufSize:" + bufSize);
             MultipartStream multipartStream =
-              new MultipartStream(content, boundary, boundary.length, null);
-            //MultipartStream multipartStream =
-              //      new MultipartStream(content, MediaType.MULTIPART_FORM_DATA.getBytes(), base64Content.length, null);
+                    new MultipartStream(content, boundary, bufSize, null);
             
 
             //Create a ByteArrayOutputStream
