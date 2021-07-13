@@ -59,14 +59,17 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             
             //Get the content-type header and extract the boundary
             LOGGER.info("HEADERS:" + request.getHeaders());
-            Map<String, String> hps = request.getHeaders();
+            
+            /*Map<String, String> hps = request.getHeaders();
             if (hps != null) {
                 contentType = hps.get("content-type");
             }
             String[] boundaryArray = contentType.split("=");
             
             //Transform the boundary to a byte array
-            byte[] boundary = boundaryArray[1].getBytes();
+            byte[] boundary = boundaryArray[1].getBytes();*/
+            
+            byte[] boundary = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE).getBytes();
         	
             //Log the extraction for verification purposes
             LOGGER.info("Log the extraction for verification purposes:" + new String(bI, "UTF-8") + "\n"); 
@@ -74,9 +77,13 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             //Create a ByteArrayInputStream
             ByteArrayInputStream content = new ByteArrayInputStream(bI);
             
+            LOGGER.info("Create a ByteArrayInputStream:" + content.readAllBytes().length);
+            
             //Create a MultipartStream to process the form-data
             MultipartStream multipartStream =
               new MultipartStream(content, boundary, bI.length, null);
+            
+            LOGGER.info("multipartStream.getHeaderEncoding():" + multipartStream.getHeaderEncoding());
         	
             //Create a ByteArrayOutputStream
             ByteArrayOutputStream out = new ByteArrayOutputStream();
