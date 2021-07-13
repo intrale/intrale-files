@@ -84,7 +84,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             MultipartStream multipartStream =
               new MultipartStream(content, boundary, bI.length, null);
             
-            LOGGER.info("multipartStream.getHeaderEncoding():" + multipartStream.getHeaderEncoding());
+            LOGGER.info("multipartStream.readHeaders():" + multipartStream.readHeaders());
         	
             //Create a ByteArrayOutputStream
             ByteArrayOutputStream out = new ByteArrayOutputStream();
