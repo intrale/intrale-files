@@ -49,7 +49,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         
         //Every file will be named image.jpg in this example. 
         //You will want to do something different here in production
-        String fileObjKeyName = "image.jpg";   
+        String fileObjKeyName = String.valueOf(System.currentTimeMillis()) + ".jpg";   
 
         try {
         	
@@ -112,11 +112,12 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             
             //Prepare an InputStream from the ByteArrayOutputStream
             InputStream fis = new ByteArrayInputStream(out.toByteArray());
-        	
+            LOGGER.info("InputStream length:" + fis.readAllBytes().length);
+            
             //Create our S3Client Object
-            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+            /*AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
                     .withRegion(config.getAws().getRegion())
-                    .build();
+                    .build();*/
     
             //Configure the file metadata
             ObjectMetadata metadata = new ObjectMetadata();
@@ -125,7 +126,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             metadata.setCacheControl("public, max-age=31536000");
             
             //Put file into S3
-            s3Client.putObject(config.getS3().getBucketName(), fileObjKeyName, fis, metadata);
+            provider.putObject(config.getS3().getBucketName(), fileObjKeyName, fis, metadata);
            
             //Log status
             LOGGER.info("Put object in S3");
