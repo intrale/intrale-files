@@ -4,15 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.MultipartStream;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +19,11 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import ar.com.intrale.cloud.exceptions.FunctionException;
+import net.minidev.json.JSONObject;
 
 @Singleton
 @Named(UploadFunction.FUNCTION_NAME)
@@ -34,10 +35,11 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
 	
 	@Override
 	public Response execute(UploadRequest request) throws FunctionException {
-		LOGGER.info("Ejecutando funcion para el upload de archivos");
+	     //Create the logger
+        LOGGER.info("Ejecutando UploadFunction");
         
         //Log the length of the incoming body
-		LOGGER.info(String.valueOf(request.getContent().getBytes().length));
+        LOGGER.info("the length of the incoming body:" + String.valueOf(request.getContent().getBytes().length));
 
         //Create the APIGatewayProxyResponseEvent response
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
@@ -45,110 +47,105 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         //Set up contentType String
         String contentType = "";
         
-        //Change these values to fit your region and bucket name
-        //String clientRegion = "YOUR-REGION";
-        //String bucketName = "YOUR-BUCKET-NAME";
-        
         //Every file will be named image.jpg in this example. 
         //You will want to do something different here in production
         String fileObjKeyName = "image.jpg";   
 
         try {
         	
-            //Obtenga el archivo cargado y decodifique desde base64
-            byte[] decodeContent = Base64.decodeBase64(request.getContent().getBytes());
-            LOGGER.info("decodeContent.length:" + decodeContent.length);
+            //Get the uploaded file and decode from base64
+            byte[] bI = Base64.decodeBase64(request.getContent().getBytes());
+            LOGGER.info("Get the uploaded file and decode from base64 length:" + String.valueOf(bI.length));
             
-            //Obtenga el encabezado de tipo de contenido y extraiga el límite
-            contentType = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE);
-            LOGGER.info("contentType:" + contentType);
+            //Get the content-type header and extract the boundary
+            LOGGER.info("HEADERS:" + request.getHeaders());
+            Map<String, String> hps = request.getHeaders();
+            if (hps != null) {
+                contentType = hps.get("content-type");
+            }
+            String[] boundaryArray = contentType.split("=");
             
-            //String[] boundaryArray = contentType.split("=");
-            
-            //Transforma el límite en una matriz de bytes
-            //byte[] boundary = boundaryArray[0].getBytes();
+            //Transform the boundary to a byte array
+            byte[] boundary = boundaryArray[1].getBytes();
         	
-            //Registre la extracción con fines de verificación
-            //LOGGER.info("decodeContent:" + new String(decodeContent, "UTF-8") + "\n"); 
+            //Log the extraction for verification purposes
+            LOGGER.info("Log the extraction for verification purposes:" + new String(bI, "UTF-8") + "\n"); 
             
-            //Crear un ByteArrayInputStream
-            ByteArrayInputStream content = new ByteArrayInputStream(decodeContent);
+            //Create a ByteArrayInputStream
+            ByteArrayInputStream content = new ByteArrayInputStream(bI);
+            
+            //Create a MultipartStream to process the form-data
+            MultipartStream multipartStream =
+              new MultipartStream(content, boundary, bI.length, null);
         	
-            //Crear un ByteArrayOutputStream
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-            //Cree un MultipartStream para procesar los datos del formulario
-            /*MultipartStream multipartStream =
-              new MultipartStream(content, contentType.getBytes(), decodeContent.length, null);
-            
-            //Encuentra el primer límite en MultipartStream
+            //Create a ByteArrayOutputStream
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+        	
+            //Find first boundary in the MultipartStream
             boolean nextPart = multipartStream.skipPreamble();
             
-            //Recorre cada segmento
+            //Loop through each segment
             while (nextPart) {
                 String header = multipartStream.readHeaders();
                 
-                //Encabezado de registro para depuración
+                //Log header for debugging
                 LOGGER.info("Headers:");
                 LOGGER.info(header);
                 
-                //Escriba el archivo en nuestra ByteArrayOutputStream
-                multipartStream.readBodyData(outputStream);
-                //Obtenga la siguiente parte, si corresponde
+                //Write out the file to our ByteArrayOutputStream
+                multipartStream.readBodyData(out);
+                //Get the next part, if any
                 nextPart = multipartStream.readBoundary();
             }
             
-            //Finalización del registro del procesamiento MultipartStream
+            //Log completion of MultipartStream processing
             LOGGER.info("Data written to ByteStream");
             
-            //Prepare un InputStream desde ByteArrayOutputStream
-            InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-     
-            //Configurar los metadatos del archivo
+            //Prepare an InputStream from the ByteArrayOutputStream
+            InputStream fis = new ByteArrayInputStream(out.toByteArray());
+        	
+            //Create our S3Client Object
+            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                    .withRegion(config.getAws().getRegion())
+                    .build();
+    
+            //Configure the file metadata
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(outputStream.toByteArray().length);
+            metadata.setContentLength(out.toByteArray().length);
             metadata.setContentType("image/jpeg");
-            metadata.setCacheControl("public, max-age=31536000");*/
-
-            IOUtils.write(decodeContent, outputStream);
-            LOGGER.info("ContentLength:" + outputStream.toByteArray().length);
+            metadata.setCacheControl("public, max-age=31536000");
             
-            //Ponga el archivo en S3
-            //provider.putObject(config.getS3().getBucketName(), fileObjKeyName, inputStream, metadata);
-            provider.putObject(config.getS3().getBucketName(), fileObjKeyName,  Files.write(Paths.get("/tmp/" + "sameName.jpg"), outputStream.toByteArray()).toFile());
-
-            
-            //Estado de registro 
+            //Put file into S3
+            s3Client.putObject(config.getS3().getBucketName(), fileObjKeyName, fis, metadata);
+           
+            //Log status
             LOGGER.info("Put object in S3");
 
-            //Contruir el response
-            /*response.setStatusCode(200);
+            //Provide a response
+            response.setStatusCode(200);
             Map<String, String> responseBody = new HashMap<String, String>();
             responseBody.put("Status", "File stored in S3");
             String responseBodyString = new JSONObject(responseBody).toJSONString();
             response.setBody(responseBodyString);
-            
-            return responseBodyString;*/
-            return new Response();
 
         } 
         catch(AmazonServiceException e) {
             // The call was transmitted successfully, but Amazon S3 couldn't  
             // process it, so it returned an error response.
-        	LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         catch(SdkClientException e) {
             // Amazon S3 couldn't be contacted for a response, or the client
             // couldn't parse the response from Amazon S3.
-        	LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         } 
         catch (IOException e) {
             // Handle MultipartStream class IOException
-        	LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
 
         LOGGER.info(response.toString());
-        return null;
+        return new Response();
     }
 	
 
