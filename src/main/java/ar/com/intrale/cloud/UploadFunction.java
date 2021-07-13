@@ -90,6 +90,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         	
             //Find first boundary in the MultipartStream
             boolean nextPart = multipartStream.skipPreamble();
+            LOGGER.info("multipartStream.skipPreamble():" + nextPart);
             
             //Loop through each segment
             while (nextPart) {
