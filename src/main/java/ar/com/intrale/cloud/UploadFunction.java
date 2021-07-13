@@ -59,7 +59,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             byte[] base64Content = Base64.decodeBase64(request.getContent().getBytes());
             LOGGER.info("Get the uploaded file and decode from base64 length:" + String.valueOf(base64Content.length));
             
-            //byte[] boundary = toDelete(request, contentType, base64Content); 
+            byte[] boundary = toDelete(request, contentType, base64Content); 
             
             //Create a ByteArrayInputStream
             ByteArrayInputStream content = new ByteArrayInputStream(base64Content);
@@ -67,10 +67,10 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             LOGGER.info("Create a ByteArrayInputStream:" + content.readAllBytes().length);
             
             //Create a MultipartStream to process the form-data
-            //MultipartStream multipartStream =
-              //new MultipartStream(content, boundary, base64Content.length, null);
             MultipartStream multipartStream =
-                    new MultipartStream(content, MediaType.MULTIPART_FORM_DATA.getBytes(), base64Content.length, null);
+              new MultipartStream(content, boundary, base64Content.length, null);
+            //MultipartStream multipartStream =
+              //      new MultipartStream(content, MediaType.MULTIPART_FORM_DATA.getBytes(), base64Content.length, null);
             
             LOGGER.info("multipartStream.toString():" + multipartStream.toString());
         	
