@@ -162,9 +162,8 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
 		byte[] boundary = boundaryArray[1].getBytes();
 		
 		//byte[] boundary = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE).getBytes();
+		LOGGER.info("boundaryArray:" + new String(boundary));
 		
-		//Log the extraction for verification purposes
-		LOGGER.info("Log the extraction for verification purposes:" + new String(base64Content, "UTF-8") + "\n");
 		return boundary;
 	}
 	
