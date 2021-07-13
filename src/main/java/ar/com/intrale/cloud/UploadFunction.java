@@ -62,8 +62,8 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             
             Map<String, String> hps = request.getHeaders();
             if (hps != null) {
-                contentType = hps.get("content-type");
-                LOGGER.info("contentType:" + contentType);
+                contentType = hps.get("Content-Type");
+                LOGGER.info("Content-Type:" + contentType);
             }
             String[] boundaryArray = contentType.split("=");
             
