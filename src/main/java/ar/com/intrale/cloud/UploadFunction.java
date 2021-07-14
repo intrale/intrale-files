@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,6 @@ import java.util.function.Consumer;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase.FileUploadIOException;
 import org.apache.commons.fileupload.MultipartStream;
@@ -60,12 +60,12 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         try {
         	
             //Get the uploaded file and decode from base64
-            byte[] base64Content = Base64.decodeBase64(request.getContent().getBytes());
-            LOGGER.info("Get the uploaded file and decode from base64 length:" + String.valueOf(base64Content.length));
+            //byte[] base64Content = Base64.decodeBase64(request.getContent().getBytes());
+            //LOGGER.info("Get the uploaded file and decode from base64 length:" + String.valueOf(base64Content.length));
             
             contentType = request.getHeaders().get(FunctionBuilder.HEADER_CONTENT_TYPE);
             
-            List<FileItem> files = FileUpload.parse(base64Content, contentType);
+            List<FileItem> files = FileUpload.parse(request.getContent().getBytes(StandardCharsets.UTF_8), contentType);
             files.forEach(new Consumer<FileItem>() {
 
 				@Override
