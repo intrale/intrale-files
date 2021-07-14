@@ -90,10 +90,10 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             // couldn't parse the response from Amazon S3.
             LOGGER.error(e.getMessage());
         } 
-        catch (IOException e) {
+        /*catch (IOException e) {
             // Handle MultipartStream class IOException
             LOGGER.error(e.getMessage());
-        }
+        }*/
 
         LOGGER.info(response.toString());
         return new Response();
