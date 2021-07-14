@@ -49,7 +49,8 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             
             byte[] base64 =  Base64.getDecoder().decode(request.getContent().getBytes(StandardCharsets.UTF_8));
             
-            List<FileItem> files = FileUpload.parse(base64, "multipart/form-data");
+            List<FileItem> files = FileUpload.parse(base64, contentType);
+            LOGGER.info("files.size():" + files.size());
             files.forEach(new Consumer<FileItem>() {
 
 				@Override
