@@ -49,7 +49,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             
             byte[] base64 =  Base64.getDecoder().decode(request.getContent().getBytes(StandardCharsets.UTF_8));
             
-            List<FileItem> files = FileUpload.parse(base64, contentType);
+            List<FileItem> files = FileUpload.parse(base64, "application/octet-stream");
             files.forEach(new Consumer<FileItem>() {
 
 				@Override
