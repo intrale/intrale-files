@@ -13,6 +13,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.MultipartStream;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             //Create a MultipartStream to process the form-data
             /*MultipartStream multipartStream =
               new MultipartStream(content, boundary, boundary.length, null);*/
-            int bufSize = base64Content.length / 5;
+            int bufSize = base64Content.length;
             LOGGER.info("bufSize:" + bufSize);
             MultipartStream multipartStream =
                     new MultipartStream(content, boundary, bufSize, null);
