@@ -75,7 +75,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
 			});
             
             
-            LOGGER.info("Finalizando"));
+            LOGGER.info("Finalizando");
             
             //oldVersion(request, response, contentType, fileObjKeyName, base64Content);
 
