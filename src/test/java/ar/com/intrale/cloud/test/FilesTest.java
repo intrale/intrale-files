@@ -17,9 +17,9 @@ import ar.com.intrale.cloud.UploadRequest;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.test.annotation.MicronautTest;
 
-/*@MicronautTest(rebuildContext = true)
+@MicronautTest(rebuildContext = true)
 @Property(name = IntraleFactory.FACTORY, value = "true")
-@Property(name = IntraleFactory.PROVIDER, value = "true")*/
+@Property(name = IntraleFactory.PROVIDER, value = "true")
 public class FilesTest extends ar.com.intrale.cloud.Test {
 	
 	@Override
@@ -30,7 +30,7 @@ public class FilesTest extends ar.com.intrale.cloud.Test {
 	public void afterEach() {
 	}
 
-	//@Test
+	@Test
 	public void test() throws Exception {
 		
 		File file = new File("src/test/resources/multipart.txt");
