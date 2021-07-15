@@ -1,24 +1,27 @@
 package ar.com.intrale.cloud.test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.StringWriter;
+import java.nio.file.Paths;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+
 import ar.com.intrale.cloud.IntraleFactory;
-import ar.com.intrale.cloud.LambdaStream;
+import ar.com.intrale.cloud.UploadFunction;
+import ar.com.intrale.cloud.UploadRequest;
 import io.micronaut.context.annotation.Property;
-import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.test.annotation.MicronautTest;
 
-@MicronautTest(rebuildContext = true)
+/*@MicronautTest(rebuildContext = true)
 @Property(name = IntraleFactory.FACTORY, value = "true")
-@Property(name = IntraleFactory.PROVIDER, value = "true")
+@Property(name = IntraleFactory.PROVIDER, value = "true")*/
 public class FilesTest extends ar.com.intrale.cloud.Test {
 	
-	private LambdaStream lambdaStream;
-
 	@Override
 	public void beforeEach() {
 	}
@@ -26,22 +29,23 @@ public class FilesTest extends ar.com.intrale.cloud.Test {
 	@Override
 	public void afterEach() {
 	}
-	
-	@Override
-	public void lambdaInstantiation() {
- 		if (lambdaStream == null) {
-			BeanIntrospection<LambdaStream> beanIntrospection = BeanIntrospection.getIntrospection(LambdaStream.class);
-			lambdaStream = beanIntrospection.instantiate();
-		}
-	}
 
-	@Test
-	public void test() {
-		try {
-			lambdaStream.handleRequest(new ByteArrayInputStream("prueba".getBytes()), new ByteArrayOutputStream(), null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	//@Test
+	public void test() throws Exception {
+		
+		File file = new File("src/test/resources/multipart.txt");
+		FileInputStream fileInputStream = new FileInputStream(file);
+		
+		UploadRequest uploadRequest = new UploadRequest();
+		uploadRequest.setContent(IOUtils.toString(fileInputStream));
+		
+		APIGatewayProxyRequestEvent event = makeRequestEvent(uploadRequest, UploadFunction.FUNCTION_NAME);
+		event.getHeaders().put("content-type", "");
+		
+		
+		APIGatewayProxyResponseEvent responseEvent = (APIGatewayProxyResponseEvent) lambda.execute(event);
+		
+		
 	}
 
 }
