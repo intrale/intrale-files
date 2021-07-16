@@ -37,11 +37,12 @@ public class FilesTest extends ar.com.intrale.cloud.Test {
 		FileInputStream fileInputStream = new FileInputStream(file);
 		
 		UploadRequest uploadRequest = new UploadRequest();
-		uploadRequest.setContent(IOUtils.toString(fileInputStream));
+		//uploadRequest.setContent(IOUtils.toString(fileInputStream));
 		
 		APIGatewayProxyRequestEvent event = makeRequestEvent(uploadRequest, UploadFunction.FUNCTION_NAME);
-		event.getHeaders().put("content-type", "");
-		
+		event.setBody(IOUtils.toString(fileInputStream));
+		event.getHeaders().put("content-type", "multipart/form-data; boundary=--427794312173857210843872");
+		event.getHeaders().put("Content-Disposition", "form-data; name=\"prueba\"");
 		
 		APIGatewayProxyResponseEvent responseEvent = (APIGatewayProxyResponseEvent) lambda.execute(event);
 		

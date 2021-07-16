@@ -2,8 +2,10 @@ package ar.com.intrale.cloud;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +30,9 @@ import net.minidev.json.JSONObject;
 @Named(UploadFunction.FUNCTION_NAME)
 public class UploadFunction extends BaseFunction<UploadRequest, Response, AmazonS3, StringToUploadRequestBuilder, FunctionResponseToHttpResponseBuilder> {
 
+	private static final String CRLF = "\r\n";
+	private static final String LF = "\n";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UploadFunction.class);
 	
 	public static final String FUNCTION_NAME = "upload";
@@ -37,9 +42,9 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
 	      
         //Create the logger
 		LOGGER.info("Loading Java Lambda handler of Proxy");
-        
+        LOGGER.info("request upload :" + request.getContent() + "#fin");
         //Log the length of the incoming body
-		LOGGER.info(String.valueOf(request.getContent().getBytes().length));
+		LOGGER.info("content length: "  + String.valueOf(request.getContent().getBytes(StandardCharsets.UTF_8).length));
 
         //Create the APIGatewayProxyResponseEvent response
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
@@ -47,19 +52,11 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         //Set up contentType String
         String contentType = "";
         
-        //Change these values to fit your region and bucket name
-        //String clientRegion = "YOUR-REGION";
-        //String bucketName = "YOUR-BUCKET-NAME";
-        
         //Every file will be named image.jpg in this example. 
         //You will want to do something different here in production
         String fileObjKeyName = "image.jpg";   
 
         try {
-        	
-            //Get the uploaded file and decode from base64
-            byte[] bI = Base64.decodeBase64(request.getContent().getBytes());
-            
             //Get the content-type header and extract the boundary
             Map<String, String> hps = request.getHeaders();
             if (hps != null) {
@@ -68,17 +65,16 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             String[] boundaryArray = contentType.split("=");
             
             //Transform the boundary to a byte array
-            byte[] boundary = boundaryArray[1].getBytes();
-        	
-            //Log the extraction for verification purposes
-            LOGGER.info(new String(bI, "UTF-8") + "\n"); 
+            byte[] boundary = boundaryArray[1].getBytes(StandardCharsets.UTF_8);
             
+        	byte[] bI = Base64.decodeBase64(request.getContent().getBytes(StandardCharsets.UTF_8));
+        	
             //Create a ByteArrayInputStream
             ByteArrayInputStream content = new ByteArrayInputStream(bI);
             
             //Create a MultipartStream to process the form-data
             MultipartStream multipartStream =
-              new MultipartStream(content, boundary, bI.length, null);
+              new MultipartStream(content, boundary/*, bI.length, null*/);
         	
             //Create a ByteArrayOutputStream
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -93,7 +89,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
                 //Log header for debugging
                 LOGGER.info("Headers:");
                 LOGGER.info(header);
-                
+ 
                 //Write out the file to our ByteArrayOutputStream
                 multipartStream.readBodyData(out);
                 //Get the next part, if any
@@ -105,11 +101,6 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             
             //Prepare an InputStream from the ByteArrayOutputStream
             InputStream fis = new ByteArrayInputStream(out.toByteArray());
-        	
-            //Create our S3Client Object
-            /*AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                    .withRegion(clientRegion)
-                    .build();*/
     
             //Configure the file metadata
             ObjectMetadata metadata = new ObjectMetadata();
@@ -134,16 +125,16 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         catch(AmazonServiceException e) {
             // The call was transmitted successfully, but Amazon S3 couldn't  
             // process it, so it returned an error response.
-        	LOGGER.error(e.getMessage());
+        	LOGGER.error(FunctionException.toString(e));
         }
         catch(SdkClientException e) {
             // Amazon S3 couldn't be contacted for a response, or the client
             // couldn't parse the response from Amazon S3.
-        	LOGGER.error(e.getMessage());
+        	LOGGER.error(FunctionException.toString(e));
         } 
         catch (IOException e) {
             // Handle MultipartStream class IOException
-        	LOGGER.error(e.getMessage());
+        	LOGGER.error(FunctionException.toString(e));
         }
 
         LOGGER.info(response.toString());
