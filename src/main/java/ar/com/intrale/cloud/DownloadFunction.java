@@ -1,5 +1,7 @@
 package ar.com.intrale.cloud;
 
+import java.util.Base64;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -7,22 +9,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.S3Object;
 
 import ar.com.intrale.cloud.exceptions.FunctionException;
 
 @Singleton
-@Named(DownloadFunction.FUNCTION_NAME)
-public class DownloadFunction extends BaseFunction<DownloadRequest, S3ObjectInputStream, AmazonS3, StringToGetProductImageRequestBuilder, FunctionResponseToHttpResponseBuilder> {
+@Named(FunctionConst.READ)
+public class DownloadFunction extends BaseFunction<Request, DownloadResponse, AmazonS3, StringToRequestDefaultBuilder, DownloadFunctionResponseToHttpResponseBuilder> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFunction.class);
-	
-	public static final String FUNCTION_NAME = "download";
 
 	@Override
-	public S3ObjectInputStream execute(DownloadRequest request) throws FunctionException {
-		LOGGER.info("GetProductImageFunction execute");
-		return provider.getObject(config.getS3().getBucketName(), request.getId()).getObjectContent();
+	public DownloadResponse execute(Request request) throws FunctionException {
+		LOGGER.info("DownloadFunction execute");
+		DownloadResponse response = new DownloadResponse();
+		try {
+			String filename = request.getQueryStringParameters().get("filename");
+			S3Object file = provider.getObject(config.getS3().getBucketName(), filename);
+			
+			byte[] fileBytes = file.getObjectContent().readAllBytes();
+			
+			response.setContent(Base64.getEncoder().encodeToString(fileBytes));
+			
+		} catch (Exception e) {
+			LOGGER.error(FunctionException.toString(e));
+		}
+		return response;		
 	}
 
 
