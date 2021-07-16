@@ -60,7 +60,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             //Get the content-type header and extract the boundary
             Map<String, String> hps = request.getHeaders();
             if (hps != null) {
-                contentType = hps.get("content-type");
+                contentType = hps.get(FunctionBuilder.HEADER_CONTENT_TYPE);
             }
             String[] boundaryArray = contentType.split("=");
             
