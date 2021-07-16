@@ -56,7 +56,7 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         
         //Every file will be named image.jpg in this example. 
         //You will want to do something different here in production
-        String fileObjKeyName /*= "image.jpg"*/;   
+        String fileObjKeyName = ""/*= "image.jpg"*/;   
 
         try {
             //Get the content-type header and extract the boundary
