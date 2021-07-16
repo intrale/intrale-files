@@ -32,6 +32,8 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
 
 	private static final String CRLF = "\r\n";
 	private static final String LF = "\n";
+	
+	private static final String FILENAME = "filename";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UploadFunction.class);
 	
@@ -54,13 +56,14 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         
         //Every file will be named image.jpg in this example. 
         //You will want to do something different here in production
-        String fileObjKeyName = "image.jpg";   
+        String fileObjKeyName /*= "image.jpg"*/;   
 
         try {
             //Get the content-type header and extract the boundary
             Map<String, String> hps = request.getHeaders();
             if (hps != null) {
                 contentType = hps.get(FunctionBuilder.HEADER_CONTENT_TYPE);
+                fileObjKeyName = hps.get(FILENAME);
             }
             String[] boundaryArray = contentType.split("=");
             
