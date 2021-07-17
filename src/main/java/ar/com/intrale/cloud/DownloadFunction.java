@@ -15,7 +15,7 @@ import ar.com.intrale.cloud.exceptions.FunctionException;
 
 @Singleton
 @Named(FunctionConst.READ)
-public class DownloadFunction extends BaseFunction<Request, DownloadResponse, AmazonS3, StringToRequestDefaultBuilder, DownloadFunctionResponseToHttpResponseBuilder> {
+public class DownloadFunction extends BaseFunction<Request, DownloadResponse, AmazonS3, DownloadStringToRequestBuilder, DownloadFunctionResponseToHttpResponseBuilder> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFunction.class);
 
