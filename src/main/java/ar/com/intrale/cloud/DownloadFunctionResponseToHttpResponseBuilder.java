@@ -40,6 +40,7 @@ public class DownloadFunctionResponseToHttpResponseBuilder implements BuilderFor
 		Map<String, String> responseHeaders = new HashMap<String, String>();
 		responseHeaders.put(FunctionConst.ACCESS_CONTROL_ALLOW_ORIGIN, FunctionConst.ALL);
 		responseHeaders.put(FunctionConst.ACCESS_CONTROL_ALLOW_METHODS, FunctionConst.GET_OPTIONS_HEAD_PUT_POST);
+		responseHeaders.put(FunctionBuilder.HEADER_CONTENT_TYPE, "image/jpg");
 		responseEvent.setHeaders(responseHeaders); 
 		
     	responseEvent.setStatusCode(target.getStatus().getCode());
