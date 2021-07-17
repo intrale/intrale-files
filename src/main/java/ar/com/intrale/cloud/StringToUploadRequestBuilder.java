@@ -10,9 +10,10 @@ import ar.com.intrale.cloud.exceptions.FunctionException;
 public class StringToUploadRequestBuilder /*extends StringToRequestBuilder<UploadRequest>*/ implements Builder<String, UploadRequest> {
 
 	@Override
-	public UploadRequest build(Map<String, String> headers, Map <String, String> queryStringParameters, String source) throws FunctionException {
+	public UploadRequest build(Map<String, String> headers, Map <String, String> pathParameters, String source) throws FunctionException {
 		UploadRequest request = new UploadRequest();
 		request.setHeaders(headers);
+		request.setPathParameters(pathParameters);
 		request.setContent(source);
 		return request;
 	}

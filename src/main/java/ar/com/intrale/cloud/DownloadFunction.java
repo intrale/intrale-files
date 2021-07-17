@@ -24,7 +24,7 @@ public class DownloadFunction extends BaseFunction<Request, DownloadResponse, Am
 		LOGGER.info("DownloadFunction execute");
 		DownloadResponse response = new DownloadResponse();
 		try {
-			String filename = request.getQueryStringParameters().get("filename");
+			String filename = request.getPathParameters().get("filename");
 			S3Object file = provider.getObject(config.getS3().getBucketName(), filename);
 			
 			byte[] fileBytes = file.getObjectContent().readAllBytes();
