@@ -28,8 +28,9 @@ public class DownloadFunction extends BaseFunction<Request, DownloadResponse, Am
 			S3Object file = provider.getObject(config.getS3().getBucketName(), filename);
 			
 			byte[] fileBytes = file.getObjectContent().readAllBytes();
-			
-			response.setContent(Base64.getEncoder().encodeToString(fileBytes));
+			String encodeFile = Base64.getEncoder().encodeToString(fileBytes);
+			String decodedFile = new String (Base64.getDecoder().decode(encodeFile));
+			response.setContent(decodedFile);
 			
 		} catch (Exception e) {
 			LOGGER.error(FunctionException.toString(e));
