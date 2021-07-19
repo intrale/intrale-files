@@ -27,12 +27,12 @@ import net.minidev.json.JSONObject;
 
 @Singleton
 @Named(UploadFunction.FUNCTION_NAME)
-public class UploadFunction extends BaseFunction<UploadRequest, Response, AmazonS3, StringToUploadRequestBuilder, FunctionResponseToHttpResponseBuilder> {
+public class UploadFunction extends BaseFunction<UploadRequest, Response, AmazonS3, StringToUploadRequestBuilder, FunctionResponseToBase64HttpResponseBuilder> {
 
 	private static final String CRLF = "\r\n";
 	private static final String LF = "\n";
 	
-	private static final String FILENAME = "filename";
+	public static final String FILENAME = "filename";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UploadFunction.class);
 	

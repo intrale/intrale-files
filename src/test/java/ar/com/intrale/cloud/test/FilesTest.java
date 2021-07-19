@@ -1,9 +1,11 @@
 package ar.com.intrale.cloud.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.StringWriter;
-import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -11,11 +13,15 @@ import org.junit.jupiter.api.Test;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 
+import ar.com.intrale.cloud.FunctionBuilder;
+import ar.com.intrale.cloud.FunctionConst;
 import ar.com.intrale.cloud.IntraleFactory;
+import ar.com.intrale.cloud.Request;
 import ar.com.intrale.cloud.UploadFunction;
 import ar.com.intrale.cloud.UploadRequest;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.test.annotation.MicronautTest;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 @MicronautTest(rebuildContext = true)
 @Property(name = IntraleFactory.FACTORY, value = "true")
@@ -36,16 +42,25 @@ public class FilesTest extends ar.com.intrale.cloud.Test {
 		File file = new File("src/test/resources/multipart.txt");
 		FileInputStream fileInputStream = new FileInputStream(file);
 		
-		UploadRequest uploadRequest = new UploadRequest();
-		//uploadRequest.setContent(IOUtils.toString(fileInputStream));
-		
-		APIGatewayProxyRequestEvent event = makeRequestEvent(uploadRequest, UploadFunction.FUNCTION_NAME);
+		APIGatewayProxyRequestEvent event = makeRequestEvent(new UploadRequest(), UploadFunction.FUNCTION_NAME);
 		event.setBody(IOUtils.toString(fileInputStream));
-		event.getHeaders().put("content-type", "multipart/form-data; boundary=--427794312173857210843872");
-		event.getHeaders().put("Content-Disposition", "form-data; name=\"prueba\"");
+		event.getHeaders().put(FunctionBuilder.HEADER_CONTENT_TYPE, "multipart/form-data; boundary=--427794312173857210843872");
+		event.getHeaders().put(UploadFunction.FILENAME, "prueba.jpg");
 		
 		APIGatewayProxyResponseEvent responseEvent = (APIGatewayProxyResponseEvent) lambda.execute(event);
 		
+		assertEquals(HttpResponseStatus.OK.code(), responseEvent.getStatusCode());
+		
+		event = makeRequestEvent(new Request(), FunctionConst.READ);
+		//event.setBody(IOUtils.toString(fileInputStream));
+		Map<String, String> pathParameters = new HashMap<String, String>();
+		pathParameters.put(FunctionBuilder.HEADER_BUSINESS_NAME, "INTRALE");
+		pathParameters.put(UploadFunction.FILENAME, "prueba.jpg");
+		event.setPathParameters(pathParameters);
+		
+		responseEvent = (APIGatewayProxyResponseEvent) lambda.execute(event);
+		
+		assertEquals(HttpResponseStatus.OK.code(), responseEvent.getStatusCode());
 		
 	}
 
