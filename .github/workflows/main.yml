@@ -16,6 +16,7 @@ jobs:
           architecture: x64 # (x64 or x86) - defaults to x64
       - name: generate package
         env:
+            VERSION: ${{ secrets.VERSION }}  
             MAVEN_SERVER_USERNAME: ${{ secrets.MAVEN_SERVER_USERNAME }}
             MAVEN_SERVER_PASSWORD: ${{ secrets.MAVEN_SERVER_PASSWORD }}
             COGNITO_ACCESS: ${{ secrets.COGNITO_ACCESS }} 
@@ -26,6 +27,8 @@ jobs:
             S3_SECRET: ${{ secrets.S3_SECRET }} 
             S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }} 
         run: | 
+             sed -i "s/DEV/$VERSION/gi" pom.xml
+             cat pom.xml            
              mkdir -p ~/.m2
              echo "<settings><servers><server><id>github</id><username>${MAVEN_SERVER_USERNAME}</username><password>${MAVEN_SERVER_PASSWORD}</password></server></servers></settings>" > ~/.m2/settings.xml
              mvn clean compile package

@@ -3,17 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>files</artifactId>
-  <version>0.5.3</version>
 
   <parent>
     <groupId>ar.com.intrale.cloud</groupId>
     <artifactId>parent</artifactId>
-    <version>0.5</version>
+    <version>DEV</version>
   </parent>
 
   <properties>
-  	<commons.version>${project.version}</commons.version>
-  	<test.version>${project.version}</test.version>
   	
   	<cognito.access>${env.COGNITO_ACCESS}</cognito.access>
 	<cognito.secret>${env.COGNITO_SECRET}</cognito.secret>  
@@ -55,14 +52,14 @@
     </repository>
     <repository>
 	  <id>github</id>
-	  <url>https://maven.pkg.github.com/llarreta/intrale</url>
+	  <url>https://maven.pkg.github.com/intrale/repo</url>
 	</repository>
   </repositories>
   <distributionManagement>
 	<repository>
 	  <id>github</id>
 	  <name>GitHub llarreta Apache Maven Packages</name>
-	  <url>https://maven.pkg.github.com/llarreta/intrale</url>
+	  <url>https://maven.pkg.github.com/intrale/repo</url>
 	</repository>
   </distributionManagement>
 
@@ -75,12 +72,12 @@
 	<dependency>
 		<groupId>ar.com.intrale.cloud</groupId>
 		<artifactId>commons</artifactId>
-		<version>0.5.2</version>
+		<version>DEV</version>
 	</dependency>
 	<dependency>
 		<groupId>ar.com.intrale.cloud</groupId>
 		<artifactId>test</artifactId>
-		<version>0.5</version>
+		<version>DEV</version>
 		<scope>test</scope>
 	</dependency>
 	<dependency>
