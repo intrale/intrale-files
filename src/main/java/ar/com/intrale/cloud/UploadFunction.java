@@ -23,6 +23,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import ar.com.intrale.cloud.exceptions.FunctionException;
+import io.micronaut.core.util.StringUtils;
 import net.minidev.json.JSONObject;
 
 @Singleton
@@ -62,6 +63,9 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             Map<String, String> hps = request.getHeaders();
             if (hps != null) {
                 contentType = hps.get(FunctionBuilder.HEADER_CONTENT_TYPE);
+                if (StringUtils.isEmpty(contentType)) {
+                	contentType = hps.get(FunctionBuilder.HEADER_CONTENT_TYPE.toLowerCase());
+                }
                 fileObjKeyName = hps.get(FILENAME);
             }
             String[] boundaryArray = contentType.split("=");
