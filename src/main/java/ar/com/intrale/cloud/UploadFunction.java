@@ -64,7 +64,8 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             Map<String, String> headers = request.getHeaders();
             if (headers != null) {
                 contentType = getContentType(headers);
-                fileKeyName = headers.get(FunctionConst.BUSINESS_NAME) + File.separator +  headers.get(FILENAME);
+                fileKeyName = headers.get(FunctionConst.BUSINESS_NAME.toLowerCase()) + File.separator +  headers.get(FILENAME);
+                LOGGER.debug("fileKeyName:" + fileKeyName);
             }
             String[] boundaryArray = contentType.split("=");
             
