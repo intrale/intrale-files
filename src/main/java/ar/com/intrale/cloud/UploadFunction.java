@@ -2,6 +2,7 @@ package ar.com.intrale.cloud;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -56,17 +57,14 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         
         //Every file will be named image.jpg in this example. 
         //You will want to do something different here in production
-        String fileObjKeyName = ""/*= "image.jpg"*/;   
+        String fileKeyName = ""/*= "image.jpg"*/;   
 
         try {
             //Get the content-type header and extract the boundary
-            Map<String, String> hps = request.getHeaders();
-            if (hps != null) {
-                contentType = hps.get(FunctionBuilder.HEADER_CONTENT_TYPE);
-                if (StringUtils.isEmpty(contentType)) {
-                	contentType = hps.get(FunctionBuilder.HEADER_CONTENT_TYPE.toLowerCase());
-                }
-                fileObjKeyName = hps.get(FILENAME);
+            Map<String, String> headers = request.getHeaders();
+            if (headers != null) {
+                contentType = getContentType(headers);
+                fileKeyName = headers.get(FunctionConst.BUSINESS_NAME) + File.separator +  headers.get(FILENAME);
             }
             String[] boundaryArray = contentType.split("=");
             
@@ -115,8 +113,8 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
             metadata.setCacheControl("public, max-age=31536000");
             
             //Put file into S3
-            provider.putObject(config.getS3().getBucketName(), fileObjKeyName, fis, metadata);
-           
+            provider.putObject(config.getS3().getBucketName(), fileKeyName, fis, metadata);
+            
             //Log status
             LOGGER.info("Put object in S3");
 
@@ -146,6 +144,15 @@ public class UploadFunction extends BaseFunction<UploadRequest, Response, Amazon
         LOGGER.info(response.toString());
         return new Response();
     }
+
+	private String getContentType(Map<String, String> headers) {
+		String contentType;
+		contentType = headers.get(FunctionBuilder.HEADER_CONTENT_TYPE);
+		if (StringUtils.isEmpty(contentType)) {
+			contentType = headers.get(FunctionBuilder.HEADER_CONTENT_TYPE.toLowerCase());
+		}
+		return contentType;
+	}
 
 	
 
